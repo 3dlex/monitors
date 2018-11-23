@@ -7,6 +7,11 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 DATE=$(date +%s%N)
 #Website name used for log path
 WEBSITE="matthewdavidson.us"
+#Setup scratch files
+ACCESS="/tmp/access.log"
+touch ${ACCESS}
+HTTPDCODES="/tmp/httpd_codes"
+touch ${HTTPDCODES}
 
 #Test log file exists and exit if not.
 if [ ! -f /var/www/html/${WEBSITE}/logs/access.log ]; then
@@ -18,13 +23,17 @@ fi
 #Create data file from apache logs
 #Pull last minute of data
 CURTIME=$(date -d -1min +'%d/%b/%Y:%H:%M' | sed 's#/#.#g')
-sed "1,/$CURTIME/d" /var/www/html/${WEBSITE}/logs/access.log > ./access.log
+sed "1,/$CURTIME/d" /var/www/html/${WEBSITE}/logs/access.log > ${ACCESS}
 
 #Extract response codes and count
-awk '{if ($9 ~ /^[0-9][0-9][0-9]$/) print $9}' ./access.log | sort -n | uniq -c > ./httpd_codes
+awk '{if ($9 ~ /^[0-9][0-9][0-9]$/) print $9}' ./access.log | sort -n | uniq -c > ${HTTPDCODES}
 
 #Process codes for telegraf 
 while IFS=" " read -r count response 
 do
   echo "my_http_code $response=$count $DATE"
-done < ./httpd_codes
+done < ${HTTPDCODES}
+
+#Cleanup
+rm ${ACCESS}
+rm ${HTTPDCODES}
