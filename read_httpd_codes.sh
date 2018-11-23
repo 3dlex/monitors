@@ -13,27 +13,45 @@ touch ${ACCESS}
 HTTPDCODES="/tmp/httpd_codes"
 touch ${HTTPDCODES}
 
-#Test log file exists and exit if not.
-if [ ! -f /var/www/html/${WEBSITE}/logs/access.log ]; then
-	#Log error to screen and to logfile. Remove -s to only log
-	logger -s "${DIR}/${ME} Log file does not exist. Exit script."
-	exit
-fi
+test_log(){
+	#Test log file exists and exit if not.
+	if [ ! -f /var/www/html/${WEBSITE}/logs/access.log ]; then
+		#Log error to screen and to logfile. Remove -s to only log
+		logger -s "${DIR}/${ME} Log file does not exist. Exit script."
+		exit
+		
+	fi
+}
 
-#Create data file from apache logs
-#Pull last minute of data
-CURTIME=$(date -d -1min +'%d/%b/%Y:%H:%M' | sed 's#/#.#g')
-sed "1,/$CURTIME/d" /var/www/html/${WEBSITE}/logs/access.log > ${ACCESS}
+pull_logs(){
+	#Create data file from apache logs
+	#Pull last minute of data
+	CURTIME=$(date -d -1min +'%d/%b/%Y:%H:%M' | sed 's#/#.#g')
+	sed "1,/$CURTIME/d" /var/www/html/${WEBSITE}/logs/access.log > ${ACCESS}
+}
 
-#Extract response codes and count
-awk '{if ($9 ~ /^[0-9][0-9][0-9]$/) print $9}' ./access.log | sort -n | uniq -c > ${HTTPDCODES}
+extract_codes(){
+	#Extract response codes and count
+	awk '{if ($9 ~ /^[0-9][0-9][0-9]$/) print $9}' ./access.log | sort -n | uniq -c > ${HTTPDCODES}
+}
 
-#Process codes for telegraf 
-while IFS=" " read -r count response 
-do
-  echo "my_http_code $response=$count $DATE"
-done < ${HTTPDCODES}
+process_codes(){
+	#Process codes for telegraf
+	while IFS=" " read -r count response 
+	do
+		echo "my_http_code $response=$count $DATE"
+	done < ${HTTPDCODES}
+}
 
-#Cleanup
-rm ${ACCESS}
-rm ${HTTPDCODES}
+cleanup(){
+	#Cleanup
+	rm ${ACCESS}
+	rm ${HTTPDCODES}
+}
+
+#Main script
+test_log
+pull_logs
+extract_codes
+process_codes
+cleanup
