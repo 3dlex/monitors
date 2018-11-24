@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#Used for inexpensive VPS from Tragic Servers, RAMNODE, etc..
 #Record top 8 processes currently running.
 proc=`ps -Ao user,uid,comm,pid,pcpu,tty --sort=-pcpu | head -n 8`
 date=$(date)
