@@ -47,7 +47,8 @@ else
   echo "$date Used = $swapload KB Total = 262144 KB" >> /root/scripts/stats/ok_swap
 fi
 
-#Check for reboots I am not aware of.
+#Check for reboots I am not aware of on my VPS with RAMNODE.
+# Admit it is overkill but works. 
 uptrigger=2
 upload=`uptime | awk '{print $3}'`
 upresponse=`echo | awk -v T=$uptrigger -v L=$upload 'BEGIN{if ( L < T ){print "greater"}}'`
