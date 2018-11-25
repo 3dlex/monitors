@@ -37,7 +37,10 @@ extract_codes(){
 }
 
 process_codes(){
-	#Process codes for telegraf
+	#Process ${HTTPDCODES} for telegraf
+	#This awk line will process all lines in ${HTTPDCODES} and put them inline so
+	# inputs.exec / telegraf can send them to influxdb.
+	# The added i is to let influxdb know these are integers. 
 	awk '{a=(NR>1?a"i"",":"")$1} END {print "myhttpd_response_code"" " a"i"}' /tmp/httpd_codes >> /home/matthew/my_code_results
 }
 
