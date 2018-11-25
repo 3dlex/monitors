@@ -32,26 +32,25 @@ pull_logs(){
 
 extract_codes(){
 	#Extract response codes and count
-	awk '{if ($9 ~ /^[0-9][0-9][0-9]$/) print $9}' ./access.log | sort -n | uniq -c > ${HTTPDCODES}
+	#awk '{if ($9 ~ /^[0-9][0-9][0-9]$/) print $9}' ${ACCESS} | sort -n | uniq -c > ${HTTPDCODES}
+	awk '{print $9}' ${ACCESS} | sort | uniq -c | sort -rn | awk '{print $2 "=" $1}' > ${HTTPDCODES}
 }
 
 process_codes(){
 	#Process codes for telegraf
-	while IFS=" " read -r count response 
-	do
-		echo "my_http_code $response=$count $DATE"
-	done < ${HTTPDCODES}
+	awk '{a=(NR>1?a"i"",":"")$1} END {print "myhttpd_response_code"" " a"i"}' /tmp/httpd_codes >> /home/matthew/my_code_results
 }
 
 cleanup(){
-	#Cleanup
+	#Cleanup previous run
+	#logger -s "${DIR}/${ME} completed."
 	rm ${ACCESS}
 	rm ${HTTPDCODES}
 }
 
 #Main script
+cleanup
 test_log
 pull_logs
 extract_codes
 process_codes
-cleanup
