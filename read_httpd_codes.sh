@@ -3,8 +3,6 @@
 #Global Variables
 ME=`basename "$0"`
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-#DATE as UNIX timestamp in nanoseconds for influxdb
-DATE=$(date +%s%N)
 #Website name used for log path
 WEBSITE="matthewdavidson.us"
 #Setup scratch files
