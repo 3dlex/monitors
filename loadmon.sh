@@ -36,7 +36,6 @@ else
 fi
 
 #Check swap use.
-
 swaptrigger=200000
 swapload=`cat /proc/swaps | grep -v "Size" | awk '{print $4}'`
 swapresponse=`echo | awk -v T=$swaptrigger -v L=$swapload 'BEGIN{if ( L > T ){print "greater"}}'`
