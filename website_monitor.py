@@ -1,9 +1,13 @@
 #!/usr/bin/python
 # Simple website monitor.
 
+# Import modules
 import requests
+# Variables 
+website = "https://matthewdavidson.us"
+
 try:
-    r = requests.head("https://matthewdavidson.us")
+    r = requests.head(website)
     print(r.status_code)
     # prints the int of the status code.
 except requests.ConnectionError:
