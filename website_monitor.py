@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# Simple website monitor.
+
 import requests
 try:
     r = requests.head("https://matthewdavidson.us")
